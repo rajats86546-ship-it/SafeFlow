@@ -6,6 +6,8 @@ export interface VenueSection {
   capacity: number;
   status: 'normal' | 'congested' | 'critical';
   flowRate: number; // people per minute
+  lastAnalyzed?: string; // Timestamp of last AI camera scan
+  gateType: 'entrance' | 'exit' | 'zone';
 }
 
 export interface Incident {

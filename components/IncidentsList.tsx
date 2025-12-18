@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { MOCK_INCIDENTS } from '../constants';
 import { 
   ShieldAlert, 
   Clock, 
@@ -12,8 +11,13 @@ import {
   ShieldIcon,
   AlertOctagon
 } from 'lucide-react';
+import { Incident } from '../types';
 
-const IncidentsList: React.FC = () => {
+interface IncidentsListProps {
+  incidents: Incident[];
+}
+
+const IncidentsList: React.FC<IncidentsListProps> = ({ incidents }) => {
   const getSeverityStyles = (severity: string) => {
     switch (severity) {
       case 'critical': return 'text-red-500 bg-red-500/10 border-red-500/20';
@@ -41,16 +45,16 @@ const IncidentsList: React.FC = () => {
         </div>
         <div className="flex gap-2">
           <span className="px-3 py-1 bg-red-500/10 text-red-400 text-xs font-bold rounded-full border border-red-500/20">
-            {MOCK_INCIDENTS.filter(i => i.status !== 'resolved').length} Active
+            {incidents.filter(i => i.status !== 'resolved').length} Active
           </span>
           <span className="px-3 py-1 bg-slate-800 text-slate-400 text-xs font-bold rounded-full border border-slate-700">
-            {MOCK_INCIDENTS.filter(i => i.status === 'resolved').length} Resolved
+            {incidents.filter(i => i.status === 'resolved').length} Resolved
           </span>
         </div>
       </div>
 
       <div className="space-y-4">
-        {MOCK_INCIDENTS.map((incident) => (
+        {incidents.map((incident) => (
           <div 
             key={incident.id} 
             className="group bg-slate-900/50 border border-slate-800 rounded-xl p-5 hover:bg-slate-900 hover:border-slate-700 transition-all cursor-pointer"

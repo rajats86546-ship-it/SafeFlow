@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { MOCK_SECTIONS } from '../constants';
-// Added Map as MapIcon to fix the missing component error
 import { Users, AlertTriangle, CheckCircle2, Map as MapIcon } from 'lucide-react';
+import { VenueSection } from '../types';
 
-const VenueMap: React.FC = () => {
+interface VenueMapProps {
+  sections: VenueSection[];
+}
+
+const VenueMap: React.FC<VenueMapProps> = ({ sections }) => {
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'critical': return 'bg-red-950/40 border-red-500/50 shadow-red-900/20';
@@ -29,7 +32,7 @@ const VenueMap: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {MOCK_SECTIONS.map((section) => {
+        {sections.map((section) => {
           const occupancyPercent = (section.occupancy / section.capacity) * 100;
           return (
             <div 
@@ -76,7 +79,7 @@ const VenueMap: React.FC = () => {
           </div>
           <h2 className="text-xl font-semibold mb-2">Live Floorplan Integration</h2>
           <p className="text-slate-500 max-w-sm mx-auto">
-            SVG map overlay active. Heatmap layer is being calculated from current flow rates across all {MOCK_SECTIONS.length} zones.
+            SVG map overlay active. Heatmap layer is being calculated from current flow rates across all {sections.length} zones.
           </p>
         </div>
       </div>

@@ -58,5 +58,24 @@ export const geminiService = {
       contents: prompt
     });
     return response.text || "Status normal. Continue monitoring.";
+  },
+
+  async countPeopleInImage(base64Image: string): Promise<number> {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: [
+        {
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: base64Image,
+          },
+        },
+        { text: "Estimate the total number of people visible in this venue security camera feed. Return ONLY a single integer representing the count. If unsure, provide your best guess." },
+      ],
+    });
+    
+    const text = response.text?.trim() || "0";
+    const count = parseInt(text.replace(/[^0-9]/g, ""), 10);
+    return isNaN(count) ? 0 : count;
   }
 };

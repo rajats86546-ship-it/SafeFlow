@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import { Send, Bot, ShieldCheck, Route, AlertTriangle, Loader2 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
-import { MOCK_SECTIONS } from '../constants';
-import { AIResponse } from '../types';
+import { AIResponse, VenueSection } from '../types';
 
-const AISafetyHub: React.FC = () => {
+interface AISafetyHubProps {
+  sections: VenueSection[];
+}
+
+const AISafetyHub: React.FC<AISafetyHubProps> = ({ sections }) => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [type, setType] = useState("security");
@@ -20,7 +23,7 @@ const AISafetyHub: React.FC = () => {
     try {
       const result = await geminiService.analyzeSafety(
         { description, location, type: type as any },
-        MOCK_SECTIONS
+        sections
       );
       setResponse(result);
     } catch (error) {

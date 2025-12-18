@@ -13,6 +13,7 @@ import {
   Navigation
 } from 'lucide-react';
 import StatCard from './StatCard';
+import { VenueSection } from '../types';
 
 const FLOW_DATA = [
   { time: '17:00', inflow: 120, outflow: 45, density: 10 },
@@ -24,7 +25,11 @@ const FLOW_DATA = [
   { time: '20:00', inflow: 500, outflow: 1200, density: 70 },
 ];
 
-const FlowAnalysis: React.FC = () => {
+interface FlowAnalysisProps {
+  sections: VenueSection[];
+}
+
+const FlowAnalysis: React.FC<FlowAnalysisProps> = ({ sections }) => {
   return (
     <div className="p-6 space-y-8">
       <div>
@@ -89,26 +94,21 @@ const FlowAnalysis: React.FC = () => {
           Detected Congestion Points
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { zone: 'West Gate', impact: 'Heavy', time: '14 min wait', trend: 'rising' },
-            { zone: 'VIP Tunnel', impact: 'Critical', time: 'Overflow risk', trend: 'stagnant' },
-            { zone: 'South Bleachers', impact: 'Moderate', time: '8 min wait', trend: 'falling' },
-          ].map((item, i) => (
+          {sections.filter(s => s.status !== 'normal').map((item, i) => (
             <div key={i} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
               <div className="flex justify-between items-start mb-2">
-                <span className="font-bold text-sm">{item.zone}</span>
+                <span className="font-bold text-sm">{item.name}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                  item.impact === 'Critical' ? 'bg-red-500/20 text-red-400' :
-                  item.impact === 'Heavy' ? 'bg-orange-500/20 text-orange-400' :
-                  'bg-blue-500/20 text-blue-400'
+                  item.status === 'critical' ? 'bg-red-500/20 text-red-400' :
+                  'bg-orange-500/20 text-orange-400'
                 }`}>
-                  {item.impact}
+                  {item.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mb-1">{item.time}</p>
+              <p className="text-xs text-slate-500 mb-1">{item.flowRate} people/min</p>
               <div className="flex items-center gap-1">
-                 <div className={`w-1.5 h-1.5 rounded-full ${item.trend === 'rising' ? 'bg-red-500 animate-pulse' : 'bg-slate-600'}`}></div>
-                 <span className="text-[10px] text-slate-400 uppercase tracking-widest">{item.trend}</span>
+                 <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'critical' ? 'bg-red-500 animate-pulse' : 'bg-slate-600'}`}></div>
+                 <span className="text-[10px] text-slate-400 uppercase tracking-widest">Live Alert</span>
               </div>
             </div>
           ))}
