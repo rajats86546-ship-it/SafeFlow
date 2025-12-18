@@ -1,0 +1,7 @@
+{
+  "name": "Copy of SafeFlow AI - Venue Command Center",
+  "description": "A comprehensive crowd management and emergency response platform for high-density event venues, leveraging Gemini AI for real-time risk assessment and evacuation planning.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
