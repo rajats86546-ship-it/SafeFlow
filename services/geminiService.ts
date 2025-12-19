@@ -6,7 +6,6 @@ import { AIResponse, Incident, VenueSection } from "../types";
  * Utility to extract clean JSON string from potential Gemini markdown wrappers.
  */
 function extractJson(text: string): string {
-  // Regex to match code blocks with or without 'json' language specifier
   const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
   return match ? match[1].trim() : text.trim();
 }
@@ -19,7 +18,7 @@ export const geminiService = {
   async analyzeSafety(incident: Partial<Incident>, currentSections: VenueSection[]): Promise<AIResponse> {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
-      throw new Error("API Key is missing. Please connect your API key in the settings.");
+      throw new Error("API Key is missing.");
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -76,7 +75,7 @@ export const geminiService = {
    */
   async getCrowdFlowInsights(sections: VenueSection[]): Promise<string> {
     const apiKey = process.env.API_KEY;
-    if (!apiKey) return "API Key not configured.";
+    if (!apiKey) return "AI services temporarily offline.";
 
     const ai = new GoogleGenAI({ apiKey });
     const prompt = `Provide a single, professional 15-word safety directive based on this venue data: ${JSON.stringify(sections)}`;
@@ -95,7 +94,7 @@ export const geminiService = {
 
   /**
    * Estimates the number of people in a provided image.
-   * Uses multi-part content structure as per SDK requirements.
+   * Optimized prompt for counting precision.
    */
   async countPeopleInImage(base64Image: string): Promise<number> {
     const apiKey = process.env.API_KEY;
@@ -113,13 +112,17 @@ export const geminiService = {
                 data: base64Image,
               },
             },
-            { text: "Count all people in this security feed. Return ONLY the number." },
+            { text: "Examine this security feed. Count the total number of distinct individuals. Respond with ONLY the numeric count. If no people are present, respond with 0." },
           ],
         },
       });
       
       const text = response.text?.trim() || "0";
-      const count = parseInt(text.replace(/[^0-9]/g, ""), 10);
+      // Extract the first sequence of numbers found in the text to be safe
+      const numbersOnly = text.match(/\d+/);
+      const count = numbersOnly ? parseInt(numbersOnly[0], 10) : 0;
+      
+      console.debug(`AI Count Result for feed: ${count} (Raw: ${text})`);
       return isNaN(count) ? 0 : count;
     } catch (err) {
       console.error("Gemini Visual Count failed:", err);
