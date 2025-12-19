@@ -2,10 +2,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIResponse, Incident, VenueSection } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const geminiService = {
   async analyzeSafety(incident: Partial<Incident>, currentSections: VenueSection[]): Promise<AIResponse> {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `
       As a venue safety AI expert, analyze this incident at a high-density event:
       Incident: ${JSON.stringify(incident)}
@@ -19,7 +18,7 @@ export const geminiService = {
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -40,7 +39,8 @@ export const geminiService = {
     });
 
     try {
-      return JSON.parse(response.text || '{}');
+      const text = response.text || '{}';
+      return JSON.parse(text);
     } catch (e) {
       console.error("Failed to parse Gemini response", e);
       return {
@@ -52,6 +52,7 @@ export const geminiService = {
   },
 
   async getCrowdFlowInsights(sections: VenueSection[]): Promise<string> {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `Analyze the following crowd density data and provide a concise (2-sentence) professional safety insight: ${JSON.stringify(sections)}`;
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -61,6 +62,7 @@ export const geminiService = {
   },
 
   async countPeopleInImage(base64Image: string): Promise<number> {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: [
