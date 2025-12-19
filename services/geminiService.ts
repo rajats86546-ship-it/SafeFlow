@@ -16,12 +16,7 @@ export const geminiService = {
    * Uses Gemini 3 Pro for complex reasoning.
    */
   async analyzeSafety(incident: Partial<Incident>, currentSections: VenueSection[]): Promise<AIResponse> {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      throw new Error("API Key is missing.");
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `
       As a world-class venue safety AI, provide a tactical response for this incident:
       Incident: ${JSON.stringify(incident)}
@@ -41,6 +36,7 @@ export const geminiService = {
         model: 'gemini-3-pro-preview',
         contents: prompt,
         config: {
+          thinkingConfig: { thinkingBudget: 16384 },
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
@@ -74,16 +70,14 @@ export const geminiService = {
    * Generates a brief safety insight based on crowd density.
    */
   async getCrowdFlowInsights(sections: VenueSection[]): Promise<string> {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) return "AI services temporarily offline.";
-
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const prompt = `Provide a single, professional 15-word safety directive based on this venue data: ${JSON.stringify(sections)}`;
     
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: prompt
+        contents: prompt,
+        config: { thinkingConfig: { thinkingBudget: 0 } }
       });
       return response.text || "Monitoring systems active. No anomalies detected.";
     } catch (err) {
@@ -94,13 +88,10 @@ export const geminiService = {
 
   /**
    * Estimates the number of people in a provided image.
-   * Optimized prompt for counting precision.
+   * Optimized prompt for counting precision and robust numeric extraction.
    */
   async countPeopleInImage(base64Image: string): Promise<number> {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) return 0;
-
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -112,18 +103,25 @@ export const geminiService = {
                 data: base64Image,
               },
             },
-            { text: "Examine this security feed. Count the total number of distinct individuals. Respond with ONLY the numeric count. If no people are present, respond with 0." },
+            { text: "CRITICAL TASK: Human Detection. Count every unique person visible in this frame. Look for heads, shoulders, and distinct human shapes. Even if partially obscured, count them as one. Respond with ONLY the numeric total (e.g. 5). If zero people are detected, respond with 0." },
           ],
         },
+        config: { 
+          thinkingConfig: { thinkingBudget: 4000 } // Enable a small reasoning budget for accurate counting
+        }
       });
       
-      const text = response.text?.trim() || "0";
-      // Extract the first sequence of numbers found in the text to be safe
-      const numbersOnly = text.match(/\d+/);
-      const count = numbersOnly ? parseInt(numbersOnly[0], 10) : 0;
+      const rawText = response.text || "";
+      console.debug("SafeFlow Vision Engine:", rawText);
+
+      // Robust extraction: find the first number in the response
+      const match = rawText.match(/\d+/);
+      if (match) {
+        const count = parseInt(match[0], 10);
+        return isNaN(count) ? 0 : count;
+      }
       
-      console.debug(`AI Count Result for feed: ${count} (Raw: ${text})`);
-      return isNaN(count) ? 0 : count;
+      return 0;
     } catch (err) {
       console.error("Gemini Visual Count failed:", err);
       return 0;

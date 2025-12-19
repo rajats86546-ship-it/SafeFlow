@@ -8,7 +8,7 @@ import {
   ExternalLink,
   Flame,
   Stethoscope,
-  ShieldIcon,
+  Shield,
   AlertOctagon
 } from 'lucide-react';
 import { Incident } from '../types';
@@ -31,7 +31,7 @@ const IncidentsList: React.FC<IncidentsListProps> = ({ incidents }) => {
     switch (type) {
       case 'medical': return <Stethoscope className="w-4 h-4" />;
       case 'fire': return <Flame className="w-4 h-4" />;
-      case 'security': return <ShieldIcon className="w-4 h-4" />;
+      case 'security': return <Shield className="w-4 h-4" />;
       default: return <AlertOctagon className="w-4 h-4" />;
     }
   };

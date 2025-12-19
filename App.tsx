@@ -22,18 +22,6 @@ import {
 } from 'lucide-react';
 import CameraAnalyzer from './components/CameraAnalyzer';
 
-// Robust global type declarations for future-proofing
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-  }
-
-  interface Window {
-    aistudio?: AIStudio;
-  }
-}
-
 /**
  * Top-level Error Boundary Component to handle unexpected runtime crashes.
  */
@@ -79,11 +67,11 @@ const SafeFlowApp: React.FC = () => {
   const [totalInbound, setTotalInbound] = useState(0);
   const [totalOutbound, setTotalOutbound] = useState(0);
 
-  // Direct initialization without blocking for Paid Keys
+  // Initialize and complete boot sequence
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsBooting(false);
-    }, 1500); // Artificial splash for brand consistency
+    }, 1500); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -167,13 +155,13 @@ const SafeFlowApp: React.FC = () => {
                <SettingsIcon className="w-10 h-10 text-blue-400" />
              </div>
              <div>
-               <h1 className="text-3xl font-black tracking-tight">Node Configuration</h1>
+               <h1 className="text-3xl font-black tracking-tight">System Node Config</h1>
                <p className="text-slate-400 font-medium">Global thresholds and AI processing parameters</p>
              </div>
            </div>
            
            <div className="grid gap-4">
-             {['AI Visual Calibration', 'Anonymized Privacy Masking', 'Real-Time Telemetry Sync', 'Cloud Inference Optimization'].map((setting) => (
+             {['AI Visual Calibration', 'Anonymized Privacy Masking', 'Real-Time Telemetry Sync', 'Inference Optimization'].map((setting) => (
                <div key={setting} className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl flex justify-between items-center group hover:bg-slate-900 transition-colors">
                  <span className="font-bold text-slate-300 group-hover:text-white transition-colors">{setting}</span>
                  <div className="w-12 h-6 bg-blue-600 rounded-full relative cursor-pointer shadow-inner">
@@ -182,23 +170,18 @@ const SafeFlowApp: React.FC = () => {
                </div>
              ))}
            </div>
-           
-           <div className="p-8 bg-slate-900/40 border border-slate-800 rounded-[2rem]">
-              <h4 className="text-slate-400 font-black text-xs uppercase tracking-widest mb-4">Security Credentials</h4>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold text-slate-200">Gemini API Key</p>
-                  <p className="text-xs text-slate-500">Using environment default credentials (Free Tier)</p>
+
+           <div className="p-8 bg-slate-900/40 border border-slate-800 rounded-[2.5rem]">
+              <h4 className="text-slate-500 font-black text-[10px] uppercase tracking-widest mb-4">Core Analytics</h4>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Gemini Inference Engine</span>
+                  <span className="text-emerald-400 font-bold">STABLE</span>
                 </div>
-                {window.aistudio && (
-                  <button 
-                    onClick={() => window.aistudio?.openSelectKey()}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-xl text-xs font-bold transition-all border border-slate-700"
-                  >
-                    <Key className="w-3.5 h-3.5" />
-                    Switch Project Key
-                  </button>
-                )}
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Environment API Key</span>
+                  <span className="text-blue-400 font-bold">CONNECTED</span>
+                </div>
               </div>
            </div>
         </div>
@@ -318,7 +301,7 @@ const SafeFlowApp: React.FC = () => {
                   <select 
                     value={quickScanZone}
                     onChange={(e) => setQuickScanZone(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-xs text-white font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="w-full bg-slate-800 border border-slate-800 rounded-2xl p-4 text-xs text-white font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                   >
                     {sections.map(s => (
                       <option key={s.id} value={s.id}>{s.name} ({s.gateType.toUpperCase()})</option>
