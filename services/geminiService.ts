@@ -103,25 +103,21 @@ export const geminiService = {
                 data: base64Image,
               },
             },
-            { text: "CRITICAL TASK: Human Detection. Count every unique person visible in this frame. Look for heads, shoulders, and distinct human shapes. Even if partially obscured, count them as one. Respond with ONLY the numeric total (e.g. 5). If zero people are detected, respond with 0." },
+            { text: "Task: Crowd Detection. Identify every distinct person in this security feed. Look for heads, shoulders, and human silhouettes. Count them carefully. Respond with ONLY the numeric count. If zero people are present, respond with 0. NO TEXT, ONLY THE NUMBER." },
           ],
         },
         config: { 
-          thinkingConfig: { thinkingBudget: 4000 } // Enable a small reasoning budget for accurate counting
+          thinkingConfig: { thinkingBudget: 2048 } // Small budget to improve counting accuracy
         }
       });
       
-      const rawText = response.text || "";
-      console.debug("SafeFlow Vision Engine:", rawText);
-
-      // Robust extraction: find the first number in the response
-      const match = rawText.match(/\d+/);
-      if (match) {
-        const count = parseInt(match[0], 10);
-        return isNaN(count) ? 0 : count;
-      }
+      const rawText = (response.text || "0").trim();
+      // Extract only digits from the response to handle cases where the AI adds extra text
+      const numericMatch = rawText.match(/\d+/);
+      const count = numericMatch ? parseInt(numericMatch[0], 10) : 0;
       
-      return 0;
+      console.debug(`[SafeFlow Vision] Detected Count: ${count} | Raw Response: "${rawText}"`);
+      return isNaN(count) ? 0 : count;
     } catch (err) {
       console.error("Gemini Visual Count failed:", err);
       return 0;

@@ -67,7 +67,7 @@ const SafeFlowApp: React.FC = () => {
   const [totalInbound, setTotalInbound] = useState(0);
   const [totalOutbound, setTotalOutbound] = useState(0);
 
-  // Initialize and complete boot sequence
+  // Direct initialization without blocking UI
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsBooting(false);
@@ -85,12 +85,15 @@ const SafeFlowApp: React.FC = () => {
       const oldCount = existingSection.occupancy;
       const diff = count - oldCount;
 
+      // Logic to track global in/out flow based on gate type
       if (diff > 0) {
         if (existingSection.gateType === 'entrance') {
           setTotalInbound(t => t + diff);
         } else if (existingSection.gateType === 'exit') {
           setTotalOutbound(t => t + diff);
         }
+      } else if (diff < 0 && existingSection.gateType === 'exit') {
+         // This logic could be expanded for more complex gate behaviors
       }
 
       return prev.map(s => {
