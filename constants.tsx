@@ -8,12 +8,14 @@ import {
   MessageSquare,
   ArrowRightLeft,
   Settings,
-  Camera
+  Camera,
+  Radar
 } from 'lucide-react';
 import { VenueSection, Incident } from './types';
 
 export const NAVIGATION_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: <Activity className="w-5 h-5" /> },
+  { id: 'tracking', label: 'Live Tracking', icon: <Radar className="w-5 h-5 text-blue-400" /> },
   { id: 'surveillance', label: 'Surveillance', icon: <Camera className="w-5 h-5" /> },
   { id: 'map', label: 'Venue Map', icon: <MapIcon className="w-5 h-5" /> },
   { id: 'incidents', label: 'Incidents', icon: <ShieldAlert className="w-5 h-5" /> },
